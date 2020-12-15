@@ -13,7 +13,7 @@
         android:layout_marginBottom="16dp"
         android:gravity="center"
         android:text="Records In All"
-        android:textSize="36dp"
+        android:textSize="36sp"
         android:textColor="#21702C"
         app:layout_constraintBottom_toTopOf="@+id/recycleview"
         app:layout_constraintEnd_toEndOf="parent"
@@ -21,11 +21,11 @@
 
     <Button
         android:id="@+id/button_record_back"
-        android:layout_width="70dp"
+        android:layout_width="100dp"
         android:layout_height="50dp"
         android:gravity="center"
         android:text="Back"
-        android:textSize="18dp"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
     <androidx.recyclerview.widget.RecyclerView

@@ -15,7 +15,7 @@ public class WrongBorder extends ConstraintLayout {
     //wrongborder view class
     public WrongBorder(@NonNull Context context) {
         super(context);
-        view=View.inflate(context,R.layout.wrong_border,this);
+        view = View.inflate(context, R.layout.wrong_border, this);
     }
 
 }

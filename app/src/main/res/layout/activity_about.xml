@@ -12,10 +12,10 @@
         android:layout_height="wrap_content"
         android:alpha="0.4"
         android:id="@+id/btn_about_back"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:background="#AED6CB"
         android:text="back"
-        android:textColor="#ffffff"
+        android:textColor="#171616"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="500dp"
         android:layout_marginTop="60dp"
-        android:background="#E4DAE6DF"
+        android:background="#E4EEF3DE"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,9 +32,10 @@
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_height="120dp"
             android:layout_marginBottom="24dp"
-            android:src="@drawable/wechat"
+            android:src="@drawable/pipi"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.497"
@@ -46,8 +47,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="36dp"
             android:gravity="center"
-            android:text="Zhao YunLong"
-            android:textSize="30dp"
+            android:text="PI PI Long"
+            android:textSize="30sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -62,8 +63,8 @@
 
 
             android:gravity="center"
-            android:text="e-mail:\n 401177923@qq.com\n Wechat: "
-            android:textSize="36dp"
+            android:text="E-MAIL:\n 401177923@qq.com\n GitHub:\n Yunlong626 "
+            android:textSize="36sp"
             app:layout_constraintBottom_toTopOf="@+id/imageView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView3"
@@ -78,7 +79,6 @@
         android:layout_height="240dp"
         android:layout_marginStart="4dp"
         android:layout_marginTop="536dp"
-
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:lottie_loop="true" />

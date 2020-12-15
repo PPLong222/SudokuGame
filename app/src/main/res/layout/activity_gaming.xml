@@ -7,8 +7,20 @@
     android:layout_height="match_parent">
 
 
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:background="#EAD6D9"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-   
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="700dp"
+        android:background="#F1EBEA"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"

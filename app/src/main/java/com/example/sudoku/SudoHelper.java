@@ -93,18 +93,18 @@ public class SudoHelper {
 
         switch (level){
             case LEVEL_NORMAL:
-                count=20;
+                count = 25;
                 break;
             case LEVLE_EASY:
-                count=15;
+                count = 20;
                 break;
             case LEVLE_DIF:
-                count=25;
+                count = 35;
                 break;
         }
-        int calloc_num=25;
-        int count_fresh=0;
-        boolean flag=true;
+        int calloc_num = 30;
+        int count_fresh = 0;
+        boolean flag = true;
         do {
             while (true) {
                 while (calloc_num > 0) {
@@ -116,15 +116,17 @@ public class SudoHelper {
                             temp[i][j] = num;
                             calloc_num--;
                         }
+
                     }
                 }
+
                 for (int i = 0; i < 9; i++) {
                     System.arraycopy(temp[i], 0, origin[i], 0, 9);
                 }
 
 
                 if (solveSudoku(temp, 0)) break;
-                calloc_num = 25;
+                calloc_num = 30;
                 temp = new int[9][9];
                 origin = new int[9][9];
             }
@@ -133,7 +135,7 @@ public class SudoHelper {
             for (int i = 0; i < count + 1; i++) {
                 int r = rand.nextInt(9);
                 int c = rand.nextInt(9);
-                if (i == count && count_fresh <= 4) {
+                if (i == count && count_fresh <= 20) {
                     return temp;
                 }
                 if (temp[r][c] != 0 && isOnlyOne(r, c, temp)) {
@@ -142,7 +144,7 @@ public class SudoHelper {
                 }
                 count_fresh++;
                 Log.d("1111","resh"+count_fresh);
-                if (count_fresh > 4) {
+                if (count_fresh > 20) {
                     flag = true;
                     break;
                 }
@@ -151,7 +153,7 @@ public class SudoHelper {
             }
 
             count_fresh = 0;
-            calloc_num = 25;
+            calloc_num = 30;
             temp = new int[9][9];
             origin = new int[9][9];
             Log.d("1111","rebuild !");

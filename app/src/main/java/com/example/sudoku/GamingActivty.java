@@ -20,16 +20,20 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.sudoku.recycleutil.MyItemDecroation;
 import com.example.sudoku.recycleutil.RecycBlockAdapter;
+
 import org.litepal.tablemanager.Connector;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -86,29 +90,30 @@ public class GamingActivty extends AppCompatActivity {
         setUi();
         dynamicGenerateBlocks();
         //asynchronous step to run a relatively time-consuming task
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                initBlocks(SudoHelper.generateSudoWithLevel(cur_level));
-            }
-        }, 1000);
-
-        //to save the bitmap in asynchronous step
-        //could have a better way to handle this
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        cur_bm = BitmapHelper.getBitmapFromView(recycle_blocks);
+                        initBlocks(SudoHelper.generateSudoWithLevel(cur_level));
+                        Handler handler_1 = new Handler();
+                        handler_1.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                cur_bm = BitmapHelper.getBitmapFromView(recycle_blocks);
+                            }
+                        }, 300);
                     }
-                }, 2000);
+                }, 700);
+
+                //to save the bitmap in asynchronous step
+                //could have a better way to handle this
             }
         });
+
+
     }
 
     //set UI in activity
@@ -215,8 +220,9 @@ public class GamingActivty extends AppCompatActivity {
             }
         });
     }
+
     /**
-     *to generate the tempImg view when touching origin block
+     * to generate the tempImg view when touching origin block
      */
     private void generateWidget(float x, float y, int i) {
         tempNum = i;
@@ -231,6 +237,7 @@ public class GamingActivty extends AppCompatActivity {
         tempImg.setLayoutParams(templayout);
         parentLayout.addView(tempImg);
     }
+
     //change location of tempimg
     private void changeWidgetLocation(float x, float y) {
         tempImg.setX(x - 100);
@@ -277,11 +284,12 @@ public class GamingActivty extends AppCompatActivity {
 
     /**
      * to search and detect the relative block of current position
+     *
      * @param x the current x of view
      * @param y the current y of view
-     * not good writing style :
+     *          not good writing style :
      *          60:   ErrorTolerance
-     *SudoHelper.BLOCK_NOTOORIGIN: to ensure it's not a origin num
+     *          SudoHelper.BLOCK_NOTOORIGIN: to ensure it's not a origin num
      */
     private void changeBlock(int x, int y) {
         for (int i = 0; i < 9; i++) {
@@ -291,24 +299,24 @@ public class GamingActivty extends AppCompatActivity {
                         if ((int) blocks[j][i].getTag() == SudoHelper.BLOCK_NOTOORIGIN) {
                             //a another way of dealing this
                             //if(SudoHelper.isValid(curNum, j, i, tempNum + 1)) --but it's much slower
-                            if (tempNum+1==answerNum[j][i]) {
+                            if (SudoHelper.isValid(curNum, j, i, tempNum + 1)) {
                                 curNum[j][i] = tempNum + 1;
                                 blocks[j][i].setImageResource(pictureNum[tempNum]);
                                 //judge if numbers have 0?
                                 if (isFull(curNum)) {
                                     // like the writing style above ,can write in:
                                     // if (SudoHelper.solveSudoku(curNum, 0)) { --but no need to add this
-                                        timer.stop();
-                                        saveImg();
-                                        lottie_end_1.setAnimation("congratu_1.json");
-                                        lottie_end_1.setVisibility(View.VISIBLE);
-                                        lottie_end_1.playAnimation();
-                                        lottie_end_1.addAnimatorListener(new AnimatorListenerAdapter() {
-                                            @Override
-                                            public void onAnimationEnd(Animator animation) {
-                                                lottie_end_1.setVisibility(View.INVISIBLE);
-                                            }
-                                        });
+                                    timer.stop();
+                                    saveImg();
+                                    lottie_end_1.setAnimation("congratu_1.json");
+                                    lottie_end_1.setVisibility(View.VISIBLE);
+                                    lottie_end_1.playAnimation();
+                                    lottie_end_1.addAnimatorListener(new AnimatorListenerAdapter() {
+                                        @Override
+                                        public void onAnimationEnd(Animator animation) {
+                                            lottie_end_1.setVisibility(View.INVISIBLE);
+                                        }
+                                    });
 
                                 }
 
