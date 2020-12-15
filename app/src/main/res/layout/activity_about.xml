@@ -4,16 +4,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="#E3C3C7"
+    android:background="#F8F5E3"
     android:layout_height="match_parent">
 
-
+    <Button
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:alpha="0.4"
+        android:id="@+id/btn_about_back"
+        android:textSize="20dp"
+        android:background="#AED6CB"
+        android:text="back"
+        android:textColor="#ffffff"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="500dp"
         android:layout_marginTop="60dp"
-        android:background="#E4CFA4A4"
+        android:background="#E4DAE6DF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,28 +33,41 @@
             android:id="@+id/imageView"
             android:layout_width="200dp"
             android:layout_height="200dp"
+            android:layout_marginBottom="24dp"
             android:src="@drawable/wechat"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
+            android:id="@+id/textView3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Game Made By： 赵云龙\nHUST 软工1902班"
+            android:layout_marginTop="36dp"
+            android:gravity="center"
+            android:text="Zhao YunLong"
             android:textSize="30dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="28dp"
+
+
+            android:gravity="center"
             android:text="e-mail:\n 401177923@qq.com\n Wechat: "
             android:textSize="36dp"
-
-
             app:layout_constraintBottom_toTopOf="@+id/imageView"
-            app:layout_constraintStart_toStartOf="parent" />
-
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView3"
+            app:layout_constraintVertical_bias="1.0" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

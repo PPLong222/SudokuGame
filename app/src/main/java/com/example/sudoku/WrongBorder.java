@@ -12,11 +12,10 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 public class WrongBorder extends ConstraintLayout {
     private View view;
 
-
+    //wrongborder view class
     public WrongBorder(@NonNull Context context) {
         super(context);
         view=View.inflate(context,R.layout.wrong_border,this);
-        Log.d("11111","3333");
     }
 
 }

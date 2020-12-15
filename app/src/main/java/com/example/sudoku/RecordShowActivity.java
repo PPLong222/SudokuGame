@@ -8,6 +8,7 @@ import android.widget.Button;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.sudoku.recycleutil.RecordViewAdapter;
@@ -25,6 +26,10 @@ public class RecordShowActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record);
         recyclerView=findViewById(R.id.recycleview);
+        //to ensure the recyclerview can be scrolled in pages ,rather than scrolling randomly
+        PagerSnapHelper snapHelper=new PagerSnapHelper();
+        snapHelper.attachToRecyclerView(recyclerView);
+
         button_back=findViewById(R.id.button_record_back);
         button_back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -39,6 +44,7 @@ public class RecordShowActivity extends AppCompatActivity {
     private void getConnectWithArray(){
 
         myRecords= DataSupport.findAll(RecordBitmap.class);
+        // judge if we don't have any record
 
         RecordViewAdapter viewAdapter=new RecordViewAdapter(myRecords);
         LinearLayoutManager manager=new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);

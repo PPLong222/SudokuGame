@@ -2,54 +2,81 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:id="@+id/main_layout"
-    android:background="#3E69C333">
+    android:background="#3E69C333"
+    tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/button_start"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="364dp"
-        android:text="开始游戏"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieAnimationView"
+        android:layout_width="500dp"
+        android:layout_height="400dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.454"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_fileName="panda.json"
+        app:lottie_loop="true" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottie_start"
+        android:layout_width="200dp"
+        android:layout_height="300dp"
+        android:layout_marginBottom="52dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline4"
+        app:layout_constraintEnd_toEndOf="@+id/button_record"
+        app:layout_constraintHorizontal_bias="0.55"
+        app:layout_constraintStart_toStartOf="@+id/button_record"
+        app:lottie_autoPlay="true"
+        app:lottie_fileName="start-game.json"
+        app:lottie_loop="true" />
 
     <Button
         android:id="@+id/button_record"
-        android:layout_width="200dp"
+        android:layout_width="180dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="记录"
+        android:layout_marginTop="132dp"
+        android:background="@drawable/shape"
+        android:text="RECORDS"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.458"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_start" />
+        app:layout_constraintTop_toBottomOf="@+id/lottieAnimationView" />
 
     <Button
         android:id="@+id/button_about"
-        android:layout_width="200dp"
+        android:layout_width="180dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="关于"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/shape"
+        android:text="ABOUT"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/button_record"
         app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/button_record"
         app:layout_constraintTop_toBottomOf="@+id/button_record" />
 
     <com.example.sudoku.LevelChoosePanel
         android:id="@+id/choosepanel"
-        android:layout_width="300dp"
+        android:layout_width="wrap_content"
         android:layout_height="300dp"
-        android:layout_marginStart="68dp"
-        android:layout_marginLeft="68dp"
-        android:layout_marginTop="236dp"
+        android:layout_marginBottom="4dp"
         android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/guideline4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_end="41dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

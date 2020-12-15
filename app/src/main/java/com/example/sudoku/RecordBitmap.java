@@ -3,6 +3,13 @@ package com.example.sudoku;
 import org.litepal.crud.DataSupport;
 
 public class RecordBitmap extends DataSupport {
+    /**
+        originurl: the url of the recycleview image
+        answerurl: the url of the answer recycleview image
+        data:      completion date
+        level:     level of this Soduku
+        completedata: time you complete the Soduku
+     */
     private String originurl;
     private String answerurl;
     private String date;

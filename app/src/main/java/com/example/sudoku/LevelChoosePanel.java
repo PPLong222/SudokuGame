@@ -33,6 +33,7 @@ public class LevelChoosePanel extends ConstraintLayout {
         btn_easy=view.findViewById(R.id.button_level_easy);
         btn_normal=view.findViewById(R.id.button_level_normal);
         btn_back=view.findViewById(R.id.btn_panelBack);
+        // add listeners to buttons to open new Activity
         btn_easy.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -57,7 +58,9 @@ public class LevelChoosePanel extends ConstraintLayout {
                 v.getContext().startActivity(intent);
             }
         });
+
     }
+    //provide a exposed public method to add listener to the button_back
     public void addListener(OnClickListener onClickListener){
         btn_back.setOnClickListener(onClickListener);
     }

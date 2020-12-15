@@ -7,43 +7,36 @@ import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
-import android.view.DragEvent;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.Chronometer;
-import android.widget.GridLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
-
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.airbnb.lottie.LottieAnimationView;
-
-import org.litepal.crud.DataSupport;
+import com.example.sudoku.recycleutil.MyItemDecroation;
+import com.example.sudoku.recycleutil.RecycBlockAdapter;
 import org.litepal.tablemanager.Connector;
-
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
-import javax.sql.DataSource;
 
 public class GamingActivty extends AppCompatActivity {
-    private ConstraintLayout parentLayout;
+    private ConstraintLayout parentLayout;  //parent layout
+    //the initialization of originblock could have a better way like array...
     private ImageView originBlock_1;
     private ImageView originBlock_2;
     private ImageView originBlock_3;
@@ -53,23 +46,30 @@ public class GamingActivty extends AppCompatActivity {
     private ImageView originBlock_7;
     private ImageView originBlock_8;
     private ImageView originBlock_9;
+
     private ImageView[] originBlocks;
-    private ImageView tempImg;
-    private GridLayout gridLayout;
+    private ImageView tempImg;              //img when moving
     private Button btn_reset;
     private Button btn_back;
     private LottieAnimationView lottie_end_1;
     private ConstraintLayout.LayoutParams templayout;
-    private ImageView[][] blocks;
-    private int[][] curNum;
-    private int tempNum;
-    private int count=0;
-    private int cur_level=0;
-    private Chronometer timer;
-    private  AnimatorSet bloackAniSet;
-    private Bitmap cur_bm;
-    private int[] pictureNum={R.drawable.one,R.drawable.two,R.drawable.three,R.drawable.four,R.drawable.five,
-            R.drawable.six,R.drawable.seven,R.drawable.eight,R.drawable.nine};
+    private ImageView[][] blocks;           //all blocks (9*9)
+    private int[][] curNum;                 //the current logic numbers
+    private int[][] answerNum;              //final numbers of the curNum
+    private int tempNum;                    //number of fingers moving
+    private int cur_level = 0;                //current level
+    private Chronometer timer;              //to calculate the time the game spend
+    private Button btn_showAnswer;
+    private RecyclerView recycle_blocks;    //recyclerview to hold all blocks
+    private Bitmap cur_bm;                  //bitmap to store current view bitmap
+    //rec_x:the x of recyclerview in all screen(left top)
+    //rec_y:the y of recyclerview in all screen(right bottom)
+    //height_tran: length of each child view in recyclerview in height
+    //width_tran:  length of each child view in recyclerview in width
+    private int rec_x, rec_y, height_tran, width_tran;
+    //int Id to save pictures of numbers in AS storage (Id)
+    private int[] pictureNum = {R.drawable.one, R.drawable.two, R.drawable.three, R.drawable.four, R.drawable.five,
+            R.drawable.six, R.drawable.seven, R.drawable.eight, R.drawable.nine};
 
     public GamingActivty() {
     }
@@ -79,58 +79,56 @@ public class GamingActivty extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gaming);
+        //get param sending from the last activity
+        Intent intent = getIntent();
+        cur_level = intent.getIntExtra("level", 0);
 
-        Intent intent=getIntent();
-        cur_level=intent.getIntExtra("level",0);
         setUi();
         dynamicGenerateBlocks();
-        //////
-        int test[][]=new int[9][9];
-        for(int i=0;i<9;i++){
-            for(int j=0;j<9;j++){
-                test[i][j]=3;
+        //asynchronous step to run a relatively time-consuming task
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initBlocks(SudoHelper.generateSudoWithLevel(cur_level));
             }
-        }
-        Log.d("1111"," "+cur_level);
+        }, 1000);
+
+        //to save the bitmap in asynchronous step
+        //could have a better way to handle this
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                initBlocks(SudoHelper.testNum);
-                Handler handler=new Handler();
+
+                Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        cur_bm=BitmapHelper.getBitmapFromView(gridLayout);
+                        cur_bm = BitmapHelper.getBitmapFromView(recycle_blocks);
                     }
-                },4000);
+                }, 2000);
             }
         });
-
-        //////
-
-
-
-
-
     }
-    //set UI in activity
-    private void setUi(){
-        originBlock_1=findViewById(R.id.origin_block1);
-        originBlock_2=findViewById(R.id.origin_block2);
-        originBlock_3=findViewById(R.id.origin_block3);
-        originBlock_4=findViewById(R.id.origin_block4);
-        originBlock_5=findViewById(R.id.origin_block5);
-        originBlock_6=findViewById(R.id.origin_block6);
-        originBlock_7=findViewById(R.id.origin_block7);
-        originBlock_8=findViewById(R.id.origin_block8);
-        originBlock_9=findViewById(R.id.origin_block9);
-        btn_back=findViewById(R.id.button_button_back);
-        btn_reset=findViewById(R.id.button_reset);
-        lottie_end_1=findViewById(R.id.lottie_end_1);
-        parentLayout=findViewById(R.id.parent_layout);
-        timer=findViewById(R.id.chro_timer);
-        gridLayout=findViewById(R.id.gridlayout_main);
 
+    //set UI in activity
+    private void setUi() {
+        originBlock_1 = findViewById(R.id.origin_block1);
+        originBlock_2 = findViewById(R.id.origin_block2);
+        originBlock_3 = findViewById(R.id.origin_block3);
+        originBlock_4 = findViewById(R.id.origin_block4);
+        originBlock_5 = findViewById(R.id.origin_block5);
+        originBlock_6 = findViewById(R.id.origin_block6);
+        originBlock_7 = findViewById(R.id.origin_block7);
+        originBlock_8 = findViewById(R.id.origin_block8);
+        originBlock_9 = findViewById(R.id.origin_block9);
+        btn_back = findViewById(R.id.button_button_back);
+        btn_showAnswer = findViewById(R.id.button_showanswer);
+        btn_reset = findViewById(R.id.button_reset);
+        lottie_end_1 = findViewById(R.id.lottie_end_1);
+        parentLayout = findViewById(R.id.parent_layout);
+        timer = findViewById(R.id.chro_timer);
+        recycle_blocks = findViewById(R.id.recycleview_blocks);
 
         setUiListener();
         startTimer();
@@ -139,55 +137,32 @@ public class GamingActivty extends AppCompatActivity {
 
     //add Listeners to UI
     @SuppressLint("ClickableViewAccessibility")
-    private void setUiListener(){
-        originBlocks=new ImageView[]{originBlock_1,originBlock_2,originBlock_3,originBlock_4
-        ,originBlock_5,originBlock_6,originBlock_7,originBlock_8,originBlock_9};
-        for(int i=0;i<9;i++){
-
+    private void setUiListener() {
+        originBlocks = new ImageView[]{originBlock_1, originBlock_2, originBlock_3, originBlock_4
+                , originBlock_5, originBlock_6, originBlock_7, originBlock_8, originBlock_9};
+        for (int i = 0; i < 9; i++) {
+            //add touchListener to each originBlocks
             originBlocks[i].setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     int j;
+                    //find the originNum when click the origin block
+                    for (j = 0; j < 9; j++)
+                        if (originBlocks[j] == v) break;
 
-
-                    for(j=0;j<9;j++)
-                        if(originBlocks[j]==v) break;
-
-
-                    switch (event.getAction()){
+                    switch (event.getAction()) {
                         case MotionEvent.ACTION_MOVE:
-                            changeWidgetLocation(event.getRawX(),event.getRawY());
-                            Log.d("1111","move"+event.getRawX()+"  "+event.getRawY());
+                            changeWidgetLocation(event.getRawX(), event.getRawY());
                             break;
+
                         case MotionEvent.ACTION_DOWN:
-                            /////////////
-                            /* A abandoned ani method
-
-                            if(tempNum!=j) {
-                                ObjectAnimator blockAni_1 = ObjectAnimator.ofFloat(originBlocks[j], "alpha", 0f, 1f);
-                                ObjectAnimator blockAni_2 = ObjectAnimator.ofFloat(originBlocks[j], "alpha", 1f, 0f);
-                                blockAni_1.setDuration(1800);
-                                blockAni_2.setDuration(500);
-                                bloackAniSet=new AnimatorSet();
-
-                                bloackAniSet.play(blockAni_2).before(blockAni_1);
-                                bloackAniSet.addListener(new AnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        bloackAniSet.start();
-                                    }
-                                });
-                                bloackAniSet.start();
-                            }
-
-                             */
-                            /////////////////////
-                            generateWidget(event.getRawX(),event.getRawY(),j);
-                            Log.d("1111","start"+event.getRawX()+"  "+event.getRawY());
+                            generateWidget(event.getRawX(), event.getRawY(), j);
                             break;
+
                         case MotionEvent.ACTION_UP:
+                            //remove the tempImg in parent view
                             parentLayout.removeView(tempImg);
-                            changeBlock((int)event.getRawX(),(int)event.getRawY());
+                            changeBlock((int) event.getRawX(), (int) event.getRawY());
                             break;
                     }
                     return true;
@@ -198,7 +173,7 @@ public class GamingActivty extends AppCompatActivity {
         btn_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(GamingActivty.this,MainActivity.class);
+                Intent intent = new Intent(GamingActivty.this, MainActivity.class);
                 startActivity(intent);
             }
         });
@@ -207,67 +182,122 @@ public class GamingActivty extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 timer.stop();
-                startTimer();
                 initBlocks(SudoHelper.generateSudoWithLevel(cur_level));
+                startTimer();
+            }
+        });
+        /**
+         * find the blocks which num equals 0 and fill pictures of right num temporarily
+         *
+         */
+        btn_showAnswer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                for (int i = 0; i < 9; i++) {
+                    for (int j = 0; j < 9; j++) {
+                        if (curNum[i][j] == 0) {
+                            final ImageView iv = blocks[i][j];
+                            blocks[i][j].setImageResource(pictureNum[answerNum[i][j] - 1]);
+                            //add property animation to the block
+                            ObjectAnimator ani = ObjectAnimator.ofFloat(blocks[i][j], "alpha", 0f, 1f, 0f, 1f, 0f);
+                            ani.setDuration(3500);
+                            ani.start();
+                            ani.addListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    iv.setImageResource(R.drawable.zero);
+                                    iv.setAlpha(1f);
+                                }
+                            });
+                        }
+                    }
+                }
             }
         });
     }
-    private void generateWidget(float x, float y,int i){
-        tempNum=i;
-        tempImg=new ImageView(this);
+    /**
+     *to generate the tempImg view when touching origin block
+     */
+    private void generateWidget(float x, float y, int i) {
+        tempNum = i;
+        tempImg = new ImageView(this);
         tempImg.setImageResource(pictureNum[i]);
-
 
         templayout = new ConstraintLayout.LayoutParams(100, 100);
         templayout.height = 100;
         templayout.width = 100;
-        tempImg.setX(x-100);
-        tempImg.setY(y-100);
+        tempImg.setX(x - 100);
+        tempImg.setY(y - 100);
         tempImg.setLayoutParams(templayout);
-
         parentLayout.addView(tempImg);
-
-
     }
-    private void changeWidgetLocation(float x,float y){
-        tempImg.setX(x-100);
-        tempImg.setY(y-100);
+    //change location of tempimg
+    private void changeWidgetLocation(float x, float y) {
+        tempImg.setX(x - 100);
+        tempImg.setY(y - 100);
     }
-    private void dynamicGenerateBlocks(){
-        blocks=new ImageView[9][9];
-        for(int i=0;i<9;i++){
-            for(int j=0;j<9;j++){
-                blocks[i][j]=new ImageView(this);
-                GridLayout.LayoutParams param=new GridLayout.LayoutParams();
-                param.height=120;
-                param.width=110;
-                param.rowSpec=GridLayout.spec(i);
-                param.columnSpec=GridLayout.spec(j);
-                param.setMargins(0,2,1,4);
-                param.setGravity(Gravity.CENTER);
 
+    /**
+     * dynamic create whole recyclerview and initial blocks when first creating
+     */
+    private void dynamicGenerateBlocks() {
+        blocks = new ImageView[9][9];
+        //add Decroation to recyclerview
+        MyItemDecroation itemDecroation = new MyItemDecroation();
+        //make style of recyclerview to ensure it's 9*9
+        StaggeredGridLayoutManager manager = new StaggeredGridLayoutManager(9, StaggeredGridLayoutManager.VERTICAL);
+        RecycBlockAdapter adapter = new RecycBlockAdapter(blocks);
+        recycle_blocks.setLayoutManager(manager);
+        recycle_blocks.addItemDecoration(itemDecroation);
+        recycle_blocks.setAdapter(adapter);
+        /*to add global listener to recyclerview
+          trigger methods when recyclerview drown first
+          initialize the blocks[][]
+         */
+        recycle_blocks.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
 
-                gridLayout.addView(blocks[i][j],param);
+                for (int i = 0; i < 9; i++) {
+                    for (int j = 0; j < 9; j++) {
+                        ImageView imageView = recycle_blocks.getChildViewHolder(recycle_blocks.getChildAt(i * 9 + j)).itemView.findViewById(R.id.img_singleblock);
+                        blocks[i][j] = imageView;
+                    }
+                }
+                //remove this listener
+                recycle_blocks.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                //initialize variable of recyclerview
+                height_tran = (recycle_blocks.getBottom() - recycle_blocks.getTop()) / 9;
+                width_tran = (recycle_blocks.getRight() - recycle_blocks.getLeft()) / 9;
+                rec_x = recycle_blocks.getLeft();
+                rec_y = recycle_blocks.getTop();
             }
-        }
+        });
     }
-    private void changeBlock(int x,int y){
-        //130 920  247 920
-        //1045
-        for(int i=0;i<9;i++){
-            if(112*i+130<x+30&&112*i+130>x-30){
-                for(int j=0;j<9;j++){
-                    if(125*j+920>y-40&&125*j+920<y+40){
-                        if((int)blocks[j][i].getTag()==SudoHelper.BLOCK_NOTOORIGIN) {
 
-
-                            Log.d("111"," "+tempNum);
-
-                            if(SudoHelper.isValid(curNum,j,i,tempNum+1)){
-                                curNum[j][i]=tempNum+1;
+    /**
+     * to search and detect the relative block of current position
+     * @param x the current x of view
+     * @param y the current y of view
+     * not good writing style :
+     *          60:   ErrorTolerance
+     *SudoHelper.BLOCK_NOTOORIGIN: to ensure it's not a origin num
+     */
+    private void changeBlock(int x, int y) {
+        for (int i = 0; i < 9; i++) {
+            if (x > width_tran * (i + 1) + rec_x - 60 && x < width_tran * (i + 1) + rec_x + 60) {
+                for (int j = 0; j < 9; j++) {
+                    if (height_tran * (j + 1) + rec_y + 60 > y && height_tran * (j + 1) + rec_y - 60 < y) {
+                        if ((int) blocks[j][i].getTag() == SudoHelper.BLOCK_NOTOORIGIN) {
+                            //a another way of dealing this
+                            //if(SudoHelper.isValid(curNum, j, i, tempNum + 1)) --but it's much slower
+                            if (tempNum+1==answerNum[j][i]) {
+                                curNum[j][i] = tempNum + 1;
                                 blocks[j][i].setImageResource(pictureNum[tempNum]);
-                                if(isFull(curNum)){
-                                    if(SudoHelper.solveSudoku(curNum)){
+                                //judge if numbers have 0?
+                                if (isFull(curNum)) {
+                                    // like the writing style above ,can write in:
+                                    // if (SudoHelper.solveSudoku(curNum, 0)) { --but no need to add this
                                         timer.stop();
                                         saveImg();
                                         lottie_end_1.setAnimation("congratu_1.json");
@@ -279,20 +309,33 @@ public class GamingActivty extends AppCompatActivity {
                                                 lottie_end_1.setVisibility(View.INVISIBLE);
                                             }
                                         });
-                                    }
+
                                 }
 
-                            }else{
-                                curNum[j][i]=tempNum+1;
+                            } else {
+                                curNum[j][i] = 0;
+                                final ImageView temp = blocks[j][i];
                                 blocks[j][i].setImageResource(pictureNum[tempNum]);
-                                final WrongBorder wrongBorder = new WrongBorder(this);
-                                ConstraintLayout.LayoutParams params=new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                                wrongBorder.setX(130+112*(i-1));
-                                wrongBorder.setY(920+125*(j-1));
-                                parentLayout.addView(wrongBorder,params);
+                                ObjectAnimator block_off = ObjectAnimator.ofFloat(temp, "alpha", 1f, 0f);
+                                block_off.setDuration(2500);
+                                block_off.addListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        temp.setImageResource(R.drawable.zero);
+                                        temp.setAlpha(1f);
+                                    }
+                                });
 
-                                ObjectAnimator wrongAni_show=ObjectAnimator.ofFloat(wrongBorder,"alpha",0f,1f);
-                                ObjectAnimator wrongAni_off=ObjectAnimator.ofFloat(wrongBorder,"alpha",1f,0f);
+                                block_off.start();
+                                //dynamically set wrongborder view to current child view to show its wrong
+                                final WrongBorder wrongBorder = new WrongBorder(this);
+                                ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                                wrongBorder.setX(rec_x + width_tran * (i));
+                                wrongBorder.setY(rec_y + height_tran * (j) + 20);
+                                parentLayout.addView(wrongBorder, params);
+
+                                ObjectAnimator wrongAni_show = ObjectAnimator.ofFloat(wrongBorder, "alpha", 0f, 1f);
+                                ObjectAnimator wrongAni_off = ObjectAnimator.ofFloat(wrongBorder, "alpha", 1f, 0f);
                                 wrongAni_off.setDuration(2000);
                                 wrongAni_show.setDuration(700);
                                 wrongAni_off.addListener(new AnimatorListenerAdapter() {
@@ -303,17 +346,12 @@ public class GamingActivty extends AppCompatActivity {
 
                                     }
                                 });
-                                AnimatorSet animatorSet=new AnimatorSet();
+                                AnimatorSet animatorSet = new AnimatorSet();
                                 animatorSet.play(wrongAni_show).before(wrongAni_off);
                                 animatorSet.start();
                             }
 
-                            /////
-
-
-
-                        }
-                        else {
+                        } else {
                             Toast.makeText(this, "This block is origin!!", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -323,41 +361,42 @@ public class GamingActivty extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    private void initBlocks(final int origin[][]){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                curNum=new int[9][9];
-                for(int i=0;i<9;i++){
-                    for(int j=0;j<9;j++){
-                        curNum[i][j]=origin[i][j];
-                        if(origin[i][j]!=0){
-                            blocks[i][j].setImageResource(pictureNum[origin[i][j]-1]);
-                            blocks[i][j].setTag(SudoHelper.BLOCK_ISORIGIN);
+    private void initBlocks(final int origin[][]) {
+        //initialize
+        answerNum = new int[9][9];
+        curNum = new int[9][9];
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                curNum[i][j] = origin[i][j];
+                answerNum[i][j] = origin[i][j];
+                if (origin[i][j] != 0) {
+                    blocks[i][j].setImageResource(pictureNum[origin[i][j] - 1]);
+                    blocks[i][j].setTag(SudoHelper.BLOCK_ISORIGIN);
 
+                } else {
+                    blocks[i][j].setImageResource(R.drawable.zero);
+                    blocks[i][j].setTag(SudoHelper.BLOCK_NOTOORIGIN);
 
-                        }else{
-                            blocks[i][j].setImageResource(R.drawable.zero);
-                            blocks[i][j].setTag(SudoHelper.BLOCK_NOTOORIGIN);
-
-                        }
-                    }
                 }
-
             }
-        });
+            cur_bm = BitmapHelper.getBitmapFromView(recycle_blocks);
+
+        }
+        SudoHelper.solveSudoku(answerNum, 0);
 
 
     }
-    private void startTimer(){
+
+    private void startTimer() {
         timer.setBase(SystemClock.elapsedRealtime());
         timer.start();
     }
-    //A FOOL METHOD
-    private boolean isFull(int num[][]){
-        for(int k=0;k<9;k++){
-            for(int m=0;m<9;m++){
-                if(num[k][m]==0)
+
+    //A FOOL METHOD to judge if num[][] have any 0 element
+    private boolean isFull(int num[][]) {
+        for (int k = 0; k < 9; k++) {
+            for (int m = 0; m < 9; m++) {
+                if (num[k][m] == 0)
                     return false;
             }
         }
@@ -365,34 +404,24 @@ public class GamingActivty extends AppCompatActivity {
     }
 
 
-
-    ////SAVE IMG
-    private void saveImg(){
+    //method to SAVE IMG
+    private void saveImg() {
         Connector.getDatabase();
-        RecordBitmap newRecord=new RecordBitmap();
+        RecordBitmap newRecord = new RecordBitmap();
 
+        Bitmap img = BitmapHelper.getBitmapFromView(recycle_blocks);
 
-        Bitmap img=BitmapHelper.getBitmapFromView(gridLayout);
-        Date date=new Date();
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss");
+        String bm_answer = "level_" + cur_level + "answer" + simpleDateFormat.format(date);
+        String bm_origin = "level_" + cur_level + "origin" + simpleDateFormat.format(date);
 
-
-        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss");
-        String bm_answer="level_"+cur_level+"answer"+simpleDateFormat.format(date);
-        String bm_origin="level_"+cur_level+"origin"+simpleDateFormat.format(date);
-        newRecord.setDate(""+simpleDateFormat.format(date));
-        newRecord.setCompletedate(""+timer.getText());
+        newRecord.setDate("" + simpleDateFormat.format(date));
+        newRecord.setCompletedate("" + timer.getText());
         newRecord.setLevel(cur_level);
-        newRecord.setAnswerurl( ""+BitmapHelper.saveImg(img,bm_answer,this));
-        newRecord.setOriginurl( ""+BitmapHelper.saveImg(cur_bm,bm_origin,this));
+        newRecord.setAnswerurl("" + BitmapHelper.saveImg(img, bm_answer, this));
+        newRecord.setOriginurl("" + BitmapHelper.saveImg(cur_bm, bm_origin, this));
 
-        Log.d("111",""+ newRecord.save());
-        Log.d("111",""+ newRecord.isSaved());
-
+        newRecord.save();
     }
-
-
-
-
-
-
 }
