@@ -62,6 +62,7 @@ public class RecordViewAdapter extends RecyclerView.Adapter<RecordViewAdapter.Vi
             comp_time=itemView.findViewById(R.id.record_time);
             comp_date=itemView.findViewById(R.id.record_date);
             img_level=itemView.findViewById(R.id.img_level);
+
         }
     }
 }

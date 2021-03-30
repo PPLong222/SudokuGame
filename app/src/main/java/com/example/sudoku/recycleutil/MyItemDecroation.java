@@ -33,13 +33,20 @@ public class MyItemDecroation extends RecyclerView.ItemDecoration {
                 Rect rect=new Rect((int)v.getX(),(int)v.getY()+v.getHeight()-4,(int)v.getX()+v.getWidth(),(int)v.getY()+v.getHeight());
                 c.drawRect(rect,myPaint);
             }
+            if(i%9==0){
+                myPaint.setStrokeWidth(8);
+                c.drawLine(v.getX(),v.getY(),v.getX(),v.getY()+v.getHeight(),myPaint);
+            }
+            if(i%9==8){
+                myPaint.setStrokeWidth(8);
+                c.drawLine(v.getX()+v.getWidth(),v.getY(),v.getX()+v.getWidth(),v.getY()+v.getHeight(),myPaint);
+            }
         }
     }
 
     @Override
     public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);
-
 
     }
 }

@@ -5,17 +5,21 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageView;
@@ -264,18 +268,29 @@ public class GamingActivty extends AppCompatActivity {
         recycle_blocks.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-
+               /* DisplayMetrics displayMetrics=getResources().getDisplayMetrics();
+                int  width=displayMetrics.widthPixels;
+                int  height=displayMetrics.heightPixels;*/
+                height_tran = (recycle_blocks.getBottom() - recycle_blocks.getTop()) / 9;
+                Log.d("heightt",height_tran*9+"");
+                width_tran = (recycle_blocks.getRight() - recycle_blocks.getLeft()) / 9;
+                Log.d("heightt",width_tran*9+"");
                 for (int i = 0; i < 9; i++) {
                     for (int j = 0; j < 9; j++) {
                         ImageView imageView = recycle_blocks.getChildViewHolder(recycle_blocks.getChildAt(i * 9 + j)).itemView.findViewById(R.id.img_singleblock);
+                        ViewGroup.LayoutParams layoutParams = imageView.getLayoutParams();
+
+                        layoutParams.height = height_tran-3 ;
+                        layoutParams.width = width_tran - 3 ;
+                        imageView.setLayoutParams(layoutParams);
                         blocks[i][j] = imageView;
                     }
                 }
+
                 //remove this listener
                 recycle_blocks.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 //initialize variable of recyclerview
-                height_tran = (recycle_blocks.getBottom() - recycle_blocks.getTop()) / 9;
-                width_tran = (recycle_blocks.getRight() - recycle_blocks.getLeft()) / 9;
+
                 rec_x = recycle_blocks.getLeft();
                 rec_y = recycle_blocks.getTop();
             }
@@ -390,7 +405,7 @@ public class GamingActivty extends AppCompatActivity {
             cur_bm = BitmapHelper.getBitmapFromView(recycle_blocks);
 
         }
-        SudoHelper.solveSudoku(answerNum, 0);
+        SudoHelper.solveSudoku(answerNum, 0,-1,-1);
 
 
     }
@@ -429,7 +444,17 @@ public class GamingActivty extends AppCompatActivity {
         newRecord.setLevel(cur_level);
         newRecord.setAnswerurl("" + BitmapHelper.saveImg(img, bm_answer, this));
         newRecord.setOriginurl("" + BitmapHelper.saveImg(cur_bm, bm_origin, this));
-
+        Log.d("uriimg1","123"+newRecord.getAnswerurl());
         newRecord.save();
+    }
+
+    private int getPixelsFromDp(int size){
+
+        DisplayMetrics metrics =new DisplayMetrics();
+
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        Log.d("heightt",""+metrics.density);
+        return(size * metrics.densityDpi) / DisplayMetrics.DENSITY_DEFAULT;
+
     }
 }

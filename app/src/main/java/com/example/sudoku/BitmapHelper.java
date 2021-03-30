@@ -50,7 +50,7 @@ public class BitmapHelper {
             FileOutputStream outputStream = new FileOutputStream(mFile);             //构建输出流
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);  //compress到输出outputStream
             Uri uri = Uri.fromFile(mFile);                                             //获得图片的uri
-            Log.d("111"," "+uri.toString());
+            Log.d("imguri"," uri:"+uri.toString());
             context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri)); //发送广播通知更新图库，这样系统图库可以找到这张图片
             return uri.toString();
 

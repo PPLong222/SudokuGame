@@ -32,6 +32,7 @@ public class RecycBlockAdapter extends RecyclerView.Adapter<RecycBlockAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.imageView.setImageResource(R.drawable.zero);
+
         int row=position/9;
         int col=position%9;
         imageViews[row][col]=holder.imageView;
